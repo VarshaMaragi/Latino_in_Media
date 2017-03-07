@@ -1,10 +1,11 @@
 import urllib
-import http.client
+#import http.client
 import json
 import csv
 import codecs
 import sys
 import time
+import requests
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -127,15 +128,19 @@ def getmoviesbyyear():
 
 	
 def getmoviesdirect():
-	conn = http.client.HTTPSConnection("api.themoviedb.org")
-	payload = "{}"
-	conn.request("GET", "/3/discover/movie?with_genres=35&primary_release_year=2017&page=1&include_video=false&include_adult=false&sort_by=vote_count.desc&language=en-US&api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c", payload)
-	res = conn.getresponse()
-	data = res.read()
-	print (type(data))
-	print(data.decode("utf-8"))
-	print ("----------------------------------------")
-	print(type(data))
+	url = 'http://api.themoviedb.org'
+	params = '/3/discover/movie?with_genres=35&primary_release_year=2017&page=1&include_video=false&include_adult=false&sort_by=vote_count.desc&language=en    -US&api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c'
+	result = requests.get(str(url + params), headers = {}).json()
+	print result
+	#conn = http.client.HTTPSConnection("api.themoviedb.org")
+	#payload = "{}"
+	#conn.request("GET", "/3/discover/movie?with_genres=35&primary_release_year=2017&page=1&include_video=false&include_adult=false&sort_by=vote_count.desc&language=en-US&api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c", payload)
+	#res = conn.getresponse()
+	#data = res.read()
+	#print (type(data))
+	#print(data.decode("utf-8"))
+	#print ("----------------------------------------")
+	#print(type(data))
 
 
 def main():
