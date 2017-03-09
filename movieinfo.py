@@ -32,7 +32,7 @@ class MovieInfo(object):
 		self.actors = self.tmp_make_actors()
 		self.add_file_info()
 		self.add_imdb_info()
-		#self.add_wiki_info()
+		self.add_wiki_info()
 		self.add_last_name_info()
 
 	def tmp_make_actors(self):

@@ -4,8 +4,8 @@ import json
 import page_parser as pp
 import xml.etree.ElementTree as et
 
-FILE_NAME = '../oldcsv/orig.xml'
-FILE_NAME_2 = '../oldcsv/orig_2.xml'
+FILE_NAME = './orig.xml'
+FILE_NAME_2 = './orig_2.xml'
 PREFIX = '{urn:schemas-microsoft-com:office:spreadsheet}'
 
 class XMLfile(object):
