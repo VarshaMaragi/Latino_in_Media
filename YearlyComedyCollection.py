@@ -1,11 +1,14 @@
 import urllib
 import json
+import re
 import csv
 import codecs
 import sys
 import time
 import requests
 
+
+#LA_COUNTRIES = ["Cuba", "Dominican Republic","Puerto Rico", "Costa Rica", "El Salvador", "Guatemala", "Honduras", "Mexico", "Nicaragua", "Panama", "Argentina", "Bolivia", "Chile", "Colombia", "Ecuador",  "Guyana", "Paraguay", "Peru", "Uruguay", "Venezuela"]
 reload(sys)
 sys.setdefaultencoding('utf8')
 def getmoviesbyyear():
@@ -17,7 +20,7 @@ def getmoviesbyyear():
 	dcode["crime"]=80
 	dcode["documentary"]=99
 	dcode["drama"]=18
-	placeofbirthLatino=["Columbia"]
+	LA_COUNTRIES=re.compile(".*Cuba.*|.*Dominican Republic.*|.*Puerto Rico.*|.*Costa Rica.*|.*El Salvador.*|.*Guatemala.*|.*Mexico.*|.*Nicaragua.*|.*Panama.*|.*Argentina.*|.*Nicaragua.*|.*Bolivia.*|.*Chile.*|.*Colombia.*|.*Ecuador.*|.*Guyana.*|.*Paraguay.*|.*Peru.*|.*Uruguay.*|.*Venezuela.*")
 	year=raw_input("Enter year: ")
 	g=raw_input("Entre the genre: ")
 	genre=dcode.get(g)
@@ -63,7 +66,7 @@ def getmoviesbyyear():
 									for j in datac["cast"]:
 										print j.get("name")
 								
-										#time.sleep(1)
+										time.sleep(1)
 										url3="https://api.themoviedb.org/3/person/"+str(j.get("id"))+"?api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c&language=en-US"
 										urllib.urlretrieve(url3,"./placeofbirth.json")
 										pob=""
@@ -74,7 +77,7 @@ def getmoviesbyyear():
 											if "place_of_birth" in dataperson.keys():
 												pob=dataperson["place_of_birth"]
 												if pob!=None:
-													if "Colombia" in pob:
+													if LA_COUNTRIES.findall(pob):
 														attach="Latinx"
 											print "pob",pob
 
@@ -99,7 +102,7 @@ def getmoviesbyyear():
 											if "place_of_birth" in dataperson.keys():
 												pob=dataperson["place_of_birth"]
 												if pob!=None:
-													if "Colombia" in pob:
+													if LA_COUNTRIES.findall(pob):
 														attach="Latinx"
 											print "pob",pob
 											#if not pob:
