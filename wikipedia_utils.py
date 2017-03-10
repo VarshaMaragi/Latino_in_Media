@@ -33,18 +33,20 @@ class WikiPages(object):
 	def get_imdb_ids(self):
 		url = 'www.imdb.com/name/nm'
 		actor_ids = {}
-		links_dump = self.get_ext_links(url)
-		for elem in links_dump:
-			for page_id, content in elem['pages'].iteritems():
-				if "extlinks" not in content:
-					continue
-				for k in content["extlinks"]:
-					link = k["*"]
-					idx = link.find(url)
-					if idx > -1:
-						link_tmp = link[idx + len(url):]
-						imdb_id = link_tmp.split('/')[0]
-						actor_ids[str(content['title'])] = [str(content['pageid']), str(imdb_id.encode('utf-8'))]
+		for a in self.actors:
+			actor_ids[a.name] = 0
+#		links_dump = self.get_ext_links(url)
+#		for elem in links_dump:
+#			for page_id, content in elem['pages'].iteritems():
+#				if "extlinks" not in content:
+#					continue
+#				for k in content["extlinks"]:
+#					link = k["*"]
+#					idx = link.find(url)
+#					if idx > -1:
+#						link_tmp = link[idx + len(url):]
+#						imdb_id = link_tmp.split('/')[0]
+#						actor_ids[str(content['title'])] = [str(content['pageid']), str(imdb_id.encode('utf-8'))]
 		return actor_ids
 
 	def get_updated_title_string(self, disqualifier_field, disqualifier_val):

@@ -34,7 +34,6 @@ class XMLfile(object):
 		for worksheet in worksheets:
 			name = worksheet.attrib[PREFIX + 'Name']
 			if (name == 'Master List' or name == "1920's"):
-				print (name)
 				continue
 			table = worksheet.find(PREFIX + 'Table')
 			rows = table.findall(PREFIX + 'Row')
@@ -68,24 +67,34 @@ class XMLfile(object):
 				self.final_table.attrib[PREFIX + 'ExpandedRowCount'] = str(int(self.final_table.attrib[PREFIX + 'ExpandedRowCount']) + len(self.actors.keys()))
 			self.tree = tree
 
-	def write_new_movie(self):
-		first_row = True
-		for name, actor in self.actors.iteritems():
-			row = et.Element('ss:Row', attrib={'ss:AutoFitHeight': '0'})
-			if(first_row):
-				cell = et.Element('ss:Cell', attrib={'ss:Index': '2'})
-				data = et.Element('ss:Data', attrib={'ss:Type': 'String'})
-				data.text = self.title
-				cell.append(data)
-				row.append(cell)
-				first_row = False
+def write_new_movie(obj, movies):
+	first_row = True
+	i = 0
+	for m in movies:
+		i += 1
+		row = et.Element('ss:Row', attrib={'ss:AutoFitHeight': '0'})
+		cell = et.Element('ss:Cell', attrib={'ss:Index': '2'})
+		data = et.Element('ss:Data', attrib={'ss:Type': 'String'})
+		data.text = m[0]
+		cell.append(data)
+		row.append(cell)
+		obj.final_table.append(row)
+		for a in m[1]:
+			i += 1
+			row2 = et.Element('ss:Row', attrib={'ss:AutoFitHeight': '0'})
 			cell = et.Element('ss:Cell', attrib={'ss:Index': '4'})
 			data = et.Element('ss:Data', attrib={'ss:Type': 'String'})
-			data.text = name
+			data.text = a.name
 			cell.append(data)
-			row.append(cell)
-			self.final_table.append(row)
-		self.tree.write(FILE_NAME_2)
+			row2.append(cell)
+			obj.final_table.append(row2)
+	obj.final_table.attrib['{urn:schemas-microsoft-com:office:spreadsheet}ExpandedRowCount'] = str(int(obj.final_table.attrib['{urn:schemas-microsoft-com:office:spreadsheet}ExpandedRowCount']) + i + 2)
+	obj.tree.write(FILE_NAME_2)
+	with open(FILE_NAME_2, 'r+') as f:
+		line = '<?xml version="1.0"?>'
+		content = f.read()
+		f.seek(0, 0)
+		f.write(line.rstrip('\r\n') + '\n' + content)
 
 def get_index(cell):
 	if (str(PREFIX + 'Index') in cell.attrib):
