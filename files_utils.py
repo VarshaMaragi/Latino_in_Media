@@ -74,27 +74,58 @@ def write_new_movie(obj, movies):
 		i += 1
 		row = et.Element('ss:Row', attrib={'ss:AutoFitHeight': '0'})
 		cell = et.Element('ss:Cell', attrib={'ss:Index': '2'})
+		cell2 = et.Element('ss:Cell', attrib={'ss:Index': '10'})
+		cell3 = et.Element('ss:Cell', attrib={'ss:Index': '22'})
 		data = et.Element('ss:Data', attrib={'ss:Type': 'String'})
+		data2 = et.Element('ss:Data', attrib={'ss:Type': 'String'})
+		data3 = et.Element('ss:Data', attrib={'ss:Type': 'String'})
 		data.text = m[0]
+		data2.text = m[0]
+		data3.text = m[0]
 		cell.append(data)
+		cell2.append(data2)
+		cell3.append(data3)
 		row.append(cell)
+		row.append(cell2)
+		row.append(cell3)
 		obj.final_table.append(row)
 		for a in m[1]:
 			i += 1
-			row2 = et.Element('ss:Row', attrib={'ss:AutoFitHeight': '0'})
-			cell = et.Element('ss:Cell', attrib={'ss:Index': '4'})
-			data = et.Element('ss:Data', attrib={'ss:Type': 'String'})
-			data.text = a.name
-			cell.append(data)
-			row2.append(cell)
-			obj.final_table.append(row2)
-	obj.final_table.attrib['{urn:schemas-microsoft-com:office:spreadsheet}ExpandedRowCount'] = str(int(obj.final_table.attrib['{urn:schemas-microsoft-com:office:spreadsheet}ExpandedRowCount']) + i + 2)
+			row = et.Element('ss:Row', attrib={'ss:AutoFitHeight': '0'})
+			for cell in get_row_cells(a):
+				row.append(cell)
+			obj.final_table.append(row)
+	obj.final_table.attrib[PREFIX + 'ExpandedRowCount'] = str(int(obj.final_table.attrib[PREFIX + 'ExpandedRowCount']) + i + 2)
 	obj.tree.write(FILE_NAME_2)
 	with open(FILE_NAME_2, 'r+') as f:
 		line = '<?xml version="1.0"?>'
 		content = f.read()
 		f.seek(0, 0)
 		f.write(line.rstrip('\r\n') + '\n' + content)
+
+def get_row_cells(actor):
+
+	def get_cell_info(name, role, latino):
+		texts = [name]
+		ind = ['4']
+		#add latino info
+		texts = texts + [name, role['role']]
+		ind = ind + ['11', '12']
+		#add role info
+		texts = texts + [name, role['role']]
+		ind = ind + ['23', '24']
+		#add type info
+		return texts, ind	
+
+	(cell_texts, indices) = get_cell_info(actor.name, actor.role, actor.latino)
+	cells = []
+	for i in range(len(cell_texts)):
+		cell = et.Element('ss:Cell', attrib={'ss:Index': indices[i]})
+		data = et.Element('ss:Data', attrib={'ss:Type': 'String'})
+		data.text = cell_texts[i]
+		cell.append(data)
+		cells.append(cell)
+	return cells
 
 def get_index(cell):
 	if (str(PREFIX + 'Index') in cell.attrib):

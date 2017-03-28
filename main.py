@@ -8,16 +8,15 @@ def display_actors(actors):
 	for actor in actors:
 		print '\t' + actor.name
 		print '\t\tBirthplace:\t' + actor.birthplace
-		print '\t\tLatino:\t' + str(actor.la_ethnicity)
-		if len(actor.tags) != 0:
+		if len(actor.wiki_info.tags) != 0:
 			print '\t\tWiki Tags:' 
-		for x, content in actor.tags.iteritems():
+		for x, content in actor.wiki_info.tags.iteritems():
 			print '\t\t\t' + x
 			for y in content:
 				print '\t\t\t\t' + y
-		if len(actor.self_info) != 0:
+		if len(actor.wiki_info.self_info) != 0:
 			print '\t\tWiki info:'		
-		for x, content in actor.self_info.iteritems():
+		for x, content in actor.wiki_info.self_info.iteritems():
 			print '\t\t\t' + x		
 			for y in content:
 				print '\t\t\t\t' + y
@@ -41,13 +40,13 @@ def main():
 				continue
 			if line == movie_enumerator:
 				movie = mi.MovieInfo(movie_key, actors)
-				movie_title = True
 				movie_list.append([movie_key, actors])
 				file_obj = movie.get_file_obj() 
+				movie_title = True
 				continue
 			m = line.split(',')
 			(name, imdb_id, role, birthplace, pic) = parse_line(m)
-			actors.append(mi.Actor(name, imdb_id, role, birthplace, pic))
+			actors.append(mi.Actor(name, imdb_id, role, 0, 0, 0, birthplace, pic))
 		mi.write_to_file(file_obj, movie_list)
 
 def parse_line(word_list):
