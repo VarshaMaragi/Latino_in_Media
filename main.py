@@ -1,6 +1,7 @@
 import pprint
 import movieinfo as mi
 import YearlyComedyCollection as imdb
+import wikipedia_utils as wiki
 
 movie_enumerator = "//Movie title//"
 
@@ -23,6 +24,22 @@ def display_actors(actors):
 		print "\n"
 
 def main():
+	actors_imdb  = [["Vincent Van Gogh", ""], ["Ashton Kutcher", "0005110"], ["Mila Kunis", "0005109"], ["Justin Timberlake", "0005493"]]
+	missing, unsure, found = wiki.get_pages(actors_imdb)
+	# name, imdb_id, wiki_id
+	actors = unsure + found
+	actors_wiki = []
+	for a in actors:
+		actors_wiki.append([a[0], a[2]])
+	print wiki.get_birthplace(actors_wiki)
+	print '\n'
+	print wiki.get_categories(actors_wiki)
+	print '\n'
+	print wiki.get_plain_text(actors_wiki)
+
+
+
+def make_xml():
 	#imdb.getmoviesbyyear()
 	movie_list = []
 	movie_title = True
