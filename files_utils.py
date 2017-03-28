@@ -34,7 +34,6 @@ class XMLfile(object):
 		for worksheet in worksheets:
 			name = worksheet.attrib[PREFIX + 'Name']
 			if (name == 'Master List' or name == "1920's"):
-				print (name)
 				continue
 			table = worksheet.find(PREFIX + 'Table')
 			rows = table.findall(PREFIX + 'Row')
@@ -68,24 +67,65 @@ class XMLfile(object):
 				self.final_table.attrib[PREFIX + 'ExpandedRowCount'] = str(int(self.final_table.attrib[PREFIX + 'ExpandedRowCount']) + len(self.actors.keys()))
 			self.tree = tree
 
-	def write_new_movie(self):
-		first_row = True
-		for name, actor in self.actors.iteritems():
+def write_new_movie(obj, movies):
+	first_row = True
+	i = 0
+	for m in movies:
+		i += 1
+		row = et.Element('ss:Row', attrib={'ss:AutoFitHeight': '0'})
+		cell = et.Element('ss:Cell', attrib={'ss:Index': '2'})
+		cell2 = et.Element('ss:Cell', attrib={'ss:Index': '10'})
+		cell3 = et.Element('ss:Cell', attrib={'ss:Index': '22'})
+		data = et.Element('ss:Data', attrib={'ss:Type': 'String'})
+		data2 = et.Element('ss:Data', attrib={'ss:Type': 'String'})
+		data3 = et.Element('ss:Data', attrib={'ss:Type': 'String'})
+		data.text = m[0]
+		data2.text = m[0]
+		data3.text = m[0]
+		cell.append(data)
+		cell2.append(data2)
+		cell3.append(data3)
+		row.append(cell)
+		row.append(cell2)
+		row.append(cell3)
+		obj.final_table.append(row)
+		for a in m[1]:
+			i += 1
 			row = et.Element('ss:Row', attrib={'ss:AutoFitHeight': '0'})
-			if(first_row):
-				cell = et.Element('ss:Cell', attrib={'ss:Index': '2'})
-				data = et.Element('ss:Data', attrib={'ss:Type': 'String'})
-				data.text = self.title
-				cell.append(data)
+			for cell in get_row_cells(a):
 				row.append(cell)
-				first_row = False
-			cell = et.Element('ss:Cell', attrib={'ss:Index': '4'})
-			data = et.Element('ss:Data', attrib={'ss:Type': 'String'})
-			data.text = name
-			cell.append(data)
-			row.append(cell)
-			self.final_table.append(row)
-		self.tree.write(FILE_NAME_2)
+			obj.final_table.append(row)
+	obj.final_table.attrib[PREFIX + 'ExpandedRowCount'] = str(int(obj.final_table.attrib[PREFIX + 'ExpandedRowCount']) + i + 2)
+	obj.tree.write(FILE_NAME_2)
+	with open(FILE_NAME_2, 'r+') as f:
+		line = '<?xml version="1.0"?>'
+		content = f.read()
+		f.seek(0, 0)
+		f.write(line.rstrip('\r\n') + '\n' + content)
+
+def get_row_cells(actor):
+
+	def get_cell_info(name, role, latino):
+		texts = [name]
+		ind = ['4']
+		#add latino info
+		texts = texts + [name, role['role']]
+		ind = ind + ['11', '12']
+		#add role info
+		texts = texts + [name, role['role']]
+		ind = ind + ['23', '24']
+		#add type info
+		return texts, ind	
+
+	(cell_texts, indices) = get_cell_info(actor.name, actor.role, actor.latino)
+	cells = []
+	for i in range(len(cell_texts)):
+		cell = et.Element('ss:Cell', attrib={'ss:Index': indices[i]})
+		data = et.Element('ss:Data', attrib={'ss:Type': 'String'})
+		data.text = cell_texts[i]
+		cell.append(data)
+		cells.append(cell)
+	return cells
 
 def get_index(cell):
 	if (str(PREFIX + 'Index') in cell.attrib):
