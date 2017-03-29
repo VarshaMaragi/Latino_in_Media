@@ -18,7 +18,7 @@ def getmoviesbyyear():
 	latinolead=0
 	genlead=0
 	gensupport=0
-	latinosupport=0
+	latinosupport=0	
 	dcode["comedy"]=35
 	dcode["action"]=28
 	dcode["animation"]=16
@@ -26,6 +26,7 @@ def getmoviesbyyear():
 	dcode["crime"]=80
 	dcode["documentary"]=99
 	dcode["drama"]=18
+	wikipedialist=list()
 	LA_COUNTRIES=re.compile(".*Cuba.*|.*Dominican Republic.*|.*Puerto Rico.*|.*Costa Rica.*|.*El Salvador.*|.*Guatemala.*|.*Mexico.*|.*Nicaragua.*|.*Panama.*|.*Argentina.*|.*Nicaragua.*|.*Bolivia.*|.*Chile.*|.*Colombia.*|.*Ecuador.*|.*Guyana.*|.*Paraguay.*|.*Peru.*|.*Uruguay.*|.*Venezuela.*")
 	LA_NAMES=re.compile(".*ez$|.*do$|.*ro$")
 	year=raw_input("Enter year: ")
@@ -69,12 +70,27 @@ def getmoviesbyyear():
 							print str(rescast)
 							overviewmovie=i.get("overview")
 							if LA_COUNTRIES.findall(overviewmovie) or LA_NAMES.findall(overviewmovie):
-								f.write("\n")
-								f.write("possible Latino movie")
-								f.write("\n")
-								g.write("\n")
-								g.write("possible Latino movie")
-								g.write("\n")
+								for startwithcap in LA_COUNTRIES.findall(overviewmovie):
+									if startwithcap.istitle():
+										print startwithcap
+										f.write("\n")
+										f.write("possible Latino movie")
+										f.write("\n")
+										g.write("\n")
+										g.write("possible Latino movie")
+										g.write("\n")
+								for startwithcap in LA_NAMES.findall(overviewmovie):
+									if startwithcap.istitle():
+										print startwithcap
+										f.write("\n")
+										f.write("possible Latino movie")
+										f.write("\n")
+										g.write("\n")
+										g.write("possible Latino movie")
+										g.write("\n")
+
+
+
 							#time.sleep(2)
 							url2="https://api.themoviedb.org/3/movie/"+str(rescast)+"/casts?api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c"
 							urllib.urlretrieve (url2,"./cast2017.json");
@@ -89,7 +105,15 @@ def getmoviesbyyear():
 										flag=0
 										attachleadornot=""
 										attachnamebased=""
+										imdbid=""
 										print j.get("name")
+										tmdbid=j.get("id")
+										urlimdb="https://api.themoviedb.org/3/person/"+str(tmdbid)+"/external_ids?api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c&language=en-US"
+										urllib.urlretrieve(urlimdb,"./actorimdb.json")
+										with open('actorimdb.json') as data_fileimdb:
+											temp=json.load(data_fileimdb)
+											if "imdb_id" in temp.keys():
+												imdbid=temp["imdb_id"]
 										if j.get("order")<=2:
 											genlead=genlead+1
 										else:
@@ -128,6 +152,9 @@ def getmoviesbyyear():
 																latinosupport=latinosupport+1
 															else:
 																latinolead=latinolead+1
+												else:
+
+													wikipedialist.append((j.get("name"),imdbid))
 
 											print "pob",pob
 
@@ -196,6 +223,9 @@ def getmoviesbyyear():
 		f.write(str(gensupport))
 		f.write("\n")
 		f.write(str(latinosupport))
+
+		print(wikipedialist)
+
 
 
 	
