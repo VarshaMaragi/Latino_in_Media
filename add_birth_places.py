@@ -34,9 +34,7 @@ def update_csv(name_bp):
 	with open('Comedy2017Cast.csv', 'r+') as csvfile:
 		spamreader = csv.reader(csvfile, delimiter=';', quotechar='|')
 		for row in spamreader:
-			if len(row) < 3:
-				continue
-			if row[0] in name_bp:
+			if len(row) >= 3 and row[0] in name_bp:
 				row[2] = name_bp[row[0]]
 			for i in range(len(row)-1):
 				str_cast += row[i] + ';'
