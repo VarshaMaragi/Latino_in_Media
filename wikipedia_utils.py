@@ -10,32 +10,78 @@ HEADERS = {
 
 def get_imdb_ids(actors):
 	url = 'www.imdb.com/name/nm'
+
+	def _get_ids(actor_str, actor_ids):
+		links_dump = get_ext_links(actor_str, url)
+		for elem in links_dump:
+			for page_id, content in elem['pages'].iteritems():
+				if int(str(page_id)) <= 0:
+					actor_ids[str(content['title'])] = ["", ""]
+					continue
+				if "extlinks" not in content:
+					if "missing" in content:
+						actor_ids[str(content['title'])] = [page_id.encode('utf-8'), ""]
+					continue
+				for k in content["extlinks"]:
+					link = k["*"]
+					idx = link.find(url)
+					if idx > -1:
+						link_tmp = link[idx + len(url):]
+						imdb_id = link_tmp.split('/')[0]
+						actor_ids[str(content['title'])] = [str(content['pageid']), str(imdb_id.encode('utf-8'))]
+					else:
+						actor_ids[str(content['title'])] = [page_id.encode('utf-8'), ""]
+		return actor_ids
 	actor_ids = {}
+	actor_out = {}
 	actor_str = ""
+	i = 0
 	for a in actors:
+		if i >= 49:
+			actor_out = dict(actor_out, **_get_ids(actor_str, actor_ids))
+			actor_str = ""
+			actor_ids = {}
+			i = 0
 		actor_ids[a[0]] = ["", ""]
 		actor_str += a[0] + "|"
-	links_dump = get_ext_links(actor_str, url)
-	for elem in links_dump:
-		for page_id, content in elem['pages'].iteritems():
-			if "extlinks" not in content:
-				actor_ids[str(content['title'])] = [page_id.encode('utf-8'), ""]
-				continue
-			for k in content["extlinks"]:
-				link = k["*"]
-				idx = link.find(url)
-				if idx > -1:
-					link_tmp = link[idx + len(url):]
-					imdb_id = link_tmp.split('/')[0]
-					actor_ids[str(content['title'])] = [str(content['pageid']), str(imdb_id.encode('utf-8'))]
-				else:
-					actor_ids[str(content['title'])] = [page_id.encode('utf-8'), ""]
+		i+= 1
+	actor_out = dict(actor_out, **_get_ids(actor_str, actor_ids))
+	return actor_out
 
-	return actor_ids
+def get_wiki_ids(actors):
+
+	def _get_ids(actor_str, actor_ids):
+		extract_dump = get_extracts(actor_str)
+		for elem in extract_dump:
+			for page_id, content in elem['pages'].iteritems():
+				if int(str(page_id)) <= 0:
+					actor_ids[str(content['title'])] = ["", ""]
+					continue
+				if "extract" not in content:
+					if "missing" in content:
+						actor_ids[str(content['title'])] = [page_id.encode('utf-8'), ""]
+					continue
+				actor_ids[str(content['title'])] = [str(content['pageid']), str(content["extract"].encode('utf-8'))]
+		return actor_ids
+
+	actor_ids = {}
+	actor_out = {}
+	actor_str = ""
+	i = 0
+	for a in actors:
+		if i >= 49:
+			actor_out = dict(actor_out, **_get_ids(actor_str, actor_ids))
+			actor_str = ""
+			actor_ids = {}
+			i = 0
+		actor_ids[a[0]] = ["", ""]
+		actor_str += a[0] + "|"
+		i+= 1
+	actor_out = dict(actor_out, **_get_ids(actor_str, actor_ids))
+	return actor_out
 
 def get_pages(actors):
 	actor_ids = get_imdb_ids(actors)
-
 	missing_actors = []
 	unsure_actors = []
 	found_actors = []
@@ -46,9 +92,32 @@ def get_pages(actors):
 		elif imdb_id == "":
 			unsure_actors.append([a[0], a[1], wiki_id])
 		elif imdb_id != a[1]:
-			missing_actors.append([a])
+			missing_actors.append(a)
 		else:
 			found_actors.append([a[0], a[1], wiki_id])	
+	return missing_actors,unsure_actors, found_actors
+
+def get_pages_no_imdb(actors):
+
+	def keep_description(descript):
+		l = ['director', 'actor', 'actress', 'performer', 'comedian', 'film', 'television', 'movie']
+		for x in l:
+			if x in descript:
+				return True
+		return False
+
+	actor_ids = get_wiki_ids(actors)
+	missing_actors = []
+	unsure_actors = []
+	found_actors = []
+	for a in actors:
+		wiki_id, description = actor_ids[a[0]]
+		if wiki_id == "":
+			missing_actors.append(a)
+		elif keep_description(description):
+			found_actors.append([a[0], None, wiki_id])
+		else:
+			unsure_actors.append([a[0], None, wiki_id])	
 	return missing_actors,unsure_actors, found_actors
 
 def get_plain_text(actors):
@@ -122,6 +191,51 @@ def search_titles():
 	})
 	return True
 	
+def get_birthplace(actors):
+
+        def _get_bp(actor_titles, actor_dict):
+		print ("a: " + actor_titles)
+		for elem in get_infobox(actor_titles):
+			for page_id, content in elem['pages'].iteritems():
+				if 'revisions' in content:
+					bp = pp.get_birthplace(content['revisions'][0]['*'])
+					if bp != "":
+						actor_dict[page_id] = pp.take_out_angle_brackets(bp).encode('utf-8')
+		return actor_dict
+
+	actor_str = ""
+	actor_dict = {}
+	actor_out = {}
+        i = 0
+	for a in actors:
+                if i >= 49:
+			actor_out.update(_get_bp(actor_str, actor_dict))
+                        i = 0
+			actor_str = ""
+			actor_dict = {}
+		actor_str += a[0] + "|"
+		actor_dict[a[1]] = ""
+		i += 1
+	actor_out.update(_get_bp(actor_str, actor_dict))
+	return actor_out
+
+def get_infobox(titles):
+	info = _wiki_query({
+       		'prop': 'revisions',
+       		'rvprop': 'content',
+       		'rvsection': 0,
+       		'titles': titles
+       	})
+       	return info
+
+def get_extracts(titles):
+	info = _wiki_query({
+       		'prop': 'extracts',
+       		'exchars': '200',
+       		'titles': titles
+       	})
+       	return info
+
 def _wiki_query_no_continue(params, offset=0):
 	params['format'] = 'json'
 	params['action'] = 'query'
@@ -159,26 +273,3 @@ def _wiki_query(params):
     			break
 		last_continue = result['continue']
 	return out
-
-def get_birthplace(actors):
-	actor_str = ""
-	actor_dict = {}
-	for a in actors:
-		actor_str += a[0] + "|"
-		actor_dict[a[1]] = ""
-	for elem in get_infobox(actor_str):
-		for page_id, content in elem['pages'].iteritems():
-			if 'revisions' in content:
-				bp = pp.get_birthplace(content['revisions'][0]['*'])
-				if bp != "":
-					actor_dict[page_id] = pp.take_out_angle_brackets(bp).encode('utf-8')
-	return actor_dict
-
-def get_infobox(titles):
-	info = _wiki_query({
-       		'prop': 'revisions',
-       		'rvprop': 'content',
-       		'rvsection': 0,
-       		'titles': titles
-       	})
-       	return info

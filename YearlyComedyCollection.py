@@ -26,7 +26,7 @@ def getmoviesbyyear():
 	dcode["crime"]=80
 	dcode["documentary"]=99
 	dcode["drama"]=18
-	wikipedialist=list()
+	wikipedialist=[[],[]]
 	LA_COUNTRIES=re.compile(".*Cuba.*|.*Dominican Republic.*|.*Puerto Rico.*|.*Costa Rica.*|.*El Salvador.*|.*Guatemala.*|.*Mexico.*|.*Nicaragua.*|.*Panama.*|.*Argentina.*|.*Nicaragua.*|.*Bolivia.*|.*Chile.*|.*Colombia.*|.*Ecuador.*|.*Guyana.*|.*Paraguay.*|.*Peru.*|.*Uruguay.*|.*Venezuela.*")
 	LA_NAMES=re.compile(".*ez$|.*do$|.*ro$")
 	year=raw_input("Enter year: ")
@@ -34,7 +34,7 @@ def getmoviesbyyear():
 	genre=dcode.get(g)
 	url="https://api.themoviedb.org/3/discover/movie?api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c&language=en-US&region=US&sort_by=popularity.desc&include_adult=false&include_video=false&primary_release_year="+str(year)+"&with_genres=35&year="+str(year)+"&without_genres=28,12,16,18,80,99,18,10751,14,36,27,10402,9648,10749,878,10770,53,37,10752&with_original_language=en"
 	urllib.urlretrieve (url,"year2017.json");
-	first_one = True	
+	first_one = True
 	with open('year2017.json') as data_file:
 		data = json.load(data_file)
 		print data["total_pages"]
@@ -59,11 +59,11 @@ def getmoviesbyyear():
 							g=open('Comedy'+str(year)+'Crew.csv','a')
 							s=(i.get("original_title").encode('utf-8','ignore').decode('utf-8'))
 							#s=unicode(s.strip(codecs.BOM_UTF8), 'utf-8')
-							if first_one:
-								first_one = False
-							else:
-								f.write("//Movie title//\n")
-								g.write("//Movie title//\n")
+                                                        if first_one:
+                                                                first_one = False
+                                                        else:
+                                                                f.write("//Movie title//\n")
+                                                                g.write("//Movie title//\n")
 							f.write(s)
 							g.write(s)
 							rescast=i.get("id")
@@ -152,9 +152,13 @@ def getmoviesbyyear():
 																latinosupport=latinosupport+1
 															else:
 																latinolead=latinolead+1
-												else:
-
-													wikipedialist.append((j.get("name"),imdbid))
+												else:	
+													if imdbid == None:
+														imdbid = ""
+														wikipedialist[0].append([str(j.get("name")),imdbid])
+													else:
+														imdbid = str(imdbid)[2:]
+														wikipedialist[1].append([str(j.get("name")),imdbid])
 
 											print "pob",pob
 
@@ -224,7 +228,7 @@ def getmoviesbyyear():
 		f.write("\n")
 		f.write(str(latinosupport))
 
-		print(wikipedialist)
+		return wikipedialist
 
 
 
