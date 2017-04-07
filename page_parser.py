@@ -59,7 +59,7 @@ def clean_text(txt):
 					continue
 				x_inner += 1
 			if counter != 0:
-				print "Error in parsing: mismatched brackets!"
+				print ("Error in parsing: mismatched brackets!")
 				return ""
 			if bar_idx > 0:
 				str_out += clean_text(txt[bar_idx + 1 : x_inner - 2 ])
