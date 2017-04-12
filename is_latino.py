@@ -1,9 +1,8 @@
 import wikipedia_utils as wiki
 from unknown import getmoviesbyyear
 import csv
-from geopy.geocoders import Nominatim
-from geotext import GeoText
 from countries_constants import *
+from past_actors import *
 import ethnicity_utils as ethni
 
 def main():
@@ -41,6 +40,7 @@ def get_wiki_info(actors_imdb, actors_without_imdb):
 	for a in found:
 		labels = {}
 		sentences = {}
+		from_old_files = False
 		bp = 'birthplace not found'
 		if a[2] in wiki_labels:
 			labels = wiki_labels[a[2]]
@@ -48,41 +48,53 @@ def get_wiki_info(actors_imdb, actors_without_imdb):
 			sentences = wiki_sentences[a[2]]
 		if a[2] in bp_dict:
 			bp = bp_dict[a[2]]
+		if a[2] in past_actors_latino:
+			from_old_files = True
+			latino_dict[a[0]] = True
+		elif a[2] in past_actors_not_latino:
+			from_old_files = True
+			latino_dict[a[0]] = False
+		else:
+			latino_dict[a[0]] = is_latino(labels, sentences, bp)	
 		actor_info[a[0]] = {
 			'labels': labels,
 			'sentences': sentences,
-			'birthplace': bp
+			'birthplace': bp,
+			'from_old_files': from_old_files
 		}
-		latino_dict[a[0]] = is_latino(labels, sentences, bp)
 	return (latino_dict, actor_info)
 	
 def print_actor(actor, info, is_latino, filename):
 	labels = info['labels']
 	sentences = info['sentences']
 	bp = info['birthplace']
+	from_old = info['from_old_files']
 	out_str = actor + '\n'
-	if bp != 'birthplace not found':
-		out_str += '\t\tBirthplace:' + bp + '\n'
-	if len(labels) != 0:
-		out_str += '\t\tWiki Tags:' + '\n'
-	for x in labels:
-		out_str += '\t\t\t' + str(x) + '\n'
-		for y in labels[x]:
-			out_str += '\t\t\t\t' + str(y) + '\n'
-	if len(sentences) != 0:
-		out_str += '\t\tWiki info:' + '\n'		
-	for x in sentences: 
-		out_str += '\t\t\t' + str(x) + '\n'
-		for y in sentences[x]:
-			out_str += '\t\t\t\t' + str(y) + '\n'
-	out_str += '\t Latino: ' + is_latino + "\n\n"
+	if from_old:
+		out_str += '\t \t Catalogued in old file \n\n'
+	else:
+		if bp != 'birthplace not found':
+			out_str += '\t\tBirthplace:' + bp + '\n'
+		if len(labels) != 0:
+			out_str += '\t\tWiki Tags:' + '\n'
+		for x in labels:
+			out_str += '\t\t\t' + str(x) + '\n'
+			for y in labels[x]:
+				out_str += '\t\t\t\t' + str(y) + '\n'
+		if len(sentences) != 0:
+			out_str += '\t\tWiki info:' + '\n'		
+		for x in sentences: 
+			out_str += '\t\t\t' + str(x) + '\n'
+			for y in sentences[x]:
+				out_str += '\t\t\t\t' + str(y) + '\n'
+		out_str += '\t Latino: ' + is_latino + "\n\n"
 	with open(filename, 'a') as f:
 		f.write(out_str)
 
 def is_latino(labels, sentences, birth_place):
 	from_us = -1
 	born_in_latino_country = -1
-		
+	
 	birth_place = birth_place.strip()
 	born = ethni.get_born_us(birth_place)
 	_from = ethni.get_from_us(labels)
@@ -97,12 +109,12 @@ def is_latino(labels, sentences, birth_place):
 	if born == 0 or _from[2] == 1 or sentences[2] == 1:
 		not_la = 1
 
-	if la*us > 0:
-		return "Latino"
-	if not_la:
-		return "Not Latino"
+	#if la*us > 0:
+	#	return "Latino"
+	#if not_la:
+	#	return "Not Latino"
 	
-	return 'Unknown'#str(_from) + str(born) + str(us) + str(la) + str(not_la)
+	return str(born) + ' ' + str(_from) + ' ' + str(sentences) + ' ' + str(la*us)#'Unknown'#str(_from) + str(born) + str(us) + str(la) + str(not_la)
 	# born in US or tag is "from" blank which is place
 	# tag of descent, has descent, a parent is of descent
 
@@ -122,11 +134,11 @@ def update_csv(latino_dict, actor_info_dict):
 				str_cast += row[i] + ';'
 			str_cast += row[len(row)-1] + '\n'
 			if row[0] in actor_info_dict:
-				filename = '2017_'
-				if latino == 'Not Latino':
-					filename += 'not_'
-				if latino == 'Unknown':
-					filename += 'unknown_'
+				filename = '2017_all_'
+				#if latino == 'Not Latino':
+				#	filename += 'not_'
+				#if latino == 'Unknown':
+				#	filename += 'unknown_'
 				filename += 'latino.txt'
 				print_actor(row[0], actor_info_dict[row[0]], latino, filename)
 		csvfile.seek(0)

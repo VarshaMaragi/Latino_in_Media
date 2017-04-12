@@ -81,9 +81,7 @@ def get_wiki_ids(actors):
 	return actor_out
 
 def get_pages(actors):
-	print (actors)
 	actor_ids = get_imdb_ids(actors)
-	print (actor_ids)
 	missing_actors = []
 	unsure_actors = []
 	found_actors = []
@@ -131,10 +129,17 @@ def get_plain_text(actors):
 				if str(page_id) not in actor_dict:
 					continue
 				if 'extract' in content:
+					is_first_sent = True
+					first_sent = ""
 					chunks = content['extract'].split("\n")
 					for chunk in chunks:
 						sentences = sent_tokenize(chunk)
 						for x in sentences:
+							if (is_first_sent):
+								is_first_sent = False
+								first_sent = str(pp.take_out_angle_brackets(x))
+								actor_dict[page_id]['first_sent'] = [first_sent]
+								continue
 							(idx, latino, text_type) = pp.keep_sentence(x.lower())
 							if idx > -1:
 								if text_type in actor_dict[page_id]:
@@ -168,8 +173,8 @@ def get_categories(actors):
 			for page_id, content in elem['pages'].items():
 				if 'categories' in content:
 					for x in content['categories']:
-						c = x['title'].split(':')[1].lower()
-						(keep, latino, tag_type) = pp.keep_category(c)
+						c = x['title'].split(':')[1]
+						(keep, latino, tag_type) = pp.keep_category(c.lower())
 						if keep:
 							if tag_type not in actor_dict[str(page_id)]:
 								actor_dict[str(page_id)][tag_type] = [str(c)]
@@ -226,7 +231,6 @@ def search_titles():
 	
 def get_birthplace(actors):
 	def _get_bp(actor_titles, actor_dict):
-		print ("a: " + actor_titles)
 		for elem in get_infobox(actor_titles):
 			for page_id, content in elem['pages'].items():
 				if 'revisions' in content:
