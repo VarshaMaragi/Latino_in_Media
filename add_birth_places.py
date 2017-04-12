@@ -1,6 +1,3 @@
-import pprint
-import movieinfo as mi
-import YearlyComedyCollection as imdb
 import wikipedia_utils as wiki
 #from YearlyComedyCollection import getmoviesbyyear
 from unknown import getmoviesbyyear
@@ -22,7 +19,6 @@ def add_birth_places(actors_imdb, actors_without_imdb, filename):
 	for a in found:
 		actors_wiki.append([a[0], a[2]])
 	ids_bp = wiki.get_birthplace(actors_wiki)
-	print (len(ids_bp))
 	name_bp = {}
         for a in found:
 		if a[2] in ids_bp:

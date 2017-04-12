@@ -1,5 +1,4 @@
 import requests
-import pprint
 import json
 import page_parser as pp
 from nltk.tokenize import sent_tokenize
@@ -229,7 +228,7 @@ def get_birthplace(actors):
 	def _get_bp(actor_titles, actor_dict):
 		print ("a: " + actor_titles)
 		for elem in get_infobox(actor_titles):
-			for page_id, content in elem['pages'].iteritems():
+			for page_id, content in elem['pages'].items():
 				if 'revisions' in content:
 					bp = pp.get_birthplace(content['revisions'][0]['*'])
 					if bp != "":
