@@ -109,14 +109,12 @@ def is_latino(labels, sentences, birth_place):
 	if born == 0 or _from[2] == 1 or sentences[2] == 1:
 		not_la = 1
 
-	#if la*us > 0:
-	#	return "Latino"
-	#if not_la:
-	#	return "Not Latino"
+	if la*us > 0:
+		return "Latino"
+	if not_la:
+		return "Not Latino"
 	
-	return str(born) + ' ' + str(_from) + ' ' + str(sentences) + ' ' + str(la*us)#'Unknown'#str(_from) + str(born) + str(us) + str(la) + str(not_la)
-	# born in US or tag is "from" blank which is place
-	# tag of descent, has descent, a parent is of descent
+	return 'Unknown'
 
 def update_csv(latino_dict, actor_info_dict):
 	str_cast = ""
@@ -134,11 +132,11 @@ def update_csv(latino_dict, actor_info_dict):
 				str_cast += row[i] + ';'
 			str_cast += row[len(row)-1] + '\n'
 			if row[0] in actor_info_dict:
-				filename = '2017_all_'
-				#if latino == 'Not Latino':
-				#	filename += 'not_'
-				#if latino == 'Unknown':
-				#	filename += 'unknown_'
+				filename = '2017_'
+				if latino == 'Not Latino':
+					filename += 'not_'
+				if latino == 'Unknown':
+					filename += 'unknown_'
 				filename += 'latino.txt'
 				print_actor(row[0], actor_info_dict[row[0]], latino, filename)
 		csvfile.seek(0)
