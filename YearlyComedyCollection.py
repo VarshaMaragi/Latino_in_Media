@@ -42,8 +42,7 @@ def getmoviesbyyear():
 		with open('year2017.json') as data_file:
 			data = json.load(data_file)
 			print("Total Pages",data["total_pages"])
-			f=open('Comedy'+str(year)+'Cast.csv', 'a')
-			g=open('Comedy'+str(year)+'Crew.csv','a')
+			
 			for i in range(1,data["total_pages"]+1):
 				print "Page",i
 				print "-------------------------------------------"
@@ -53,6 +52,8 @@ def getmoviesbyyear():
 			
 
 				with open('year2017.json') as data_file2:
+					f=open('Comedy'+str(year)+'Cast.csv', 'a')
+					g=open('Comedy'+str(year)+'Crew.csv','a')
 					data2 = json.load(data_file2)
 					print "data2"
 					print data2
