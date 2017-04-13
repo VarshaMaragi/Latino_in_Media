@@ -26,7 +26,7 @@ def getmoviesbyyear():
 	dcode["crime"]=80
 	dcode["documentary"]=99
 	dcode["drama"]=18
-	wikipedialist=dict()
+	wikipedialist=[[],[]]
 	LA_COUNTRIES=re.compile(".*Cuba.*|.*Dominican Republic.*|.*Puerto Rico.*|.*Costa Rica.*|.*El Salvador.*|.*Guatemala.*|.*Mexico.*|.*Nicaragua.*|.*Panama.*|.*Argentina.*|.*Nicaragua.*|.*Bolivia.*|.*Chile.*|.*Colombia.*|.*Ecuador.*|.*Guyana.*|.*Paraguay.*|.*Peru.*|.*Uruguay.*|.*Venezuela.*")
 	LA_NAMES=re.compile(".*ez$|.*do$|.*ro$")
 	year=raw_input("Enter year: ")
@@ -53,7 +53,7 @@ def getmoviesbyyear():
 					print "data2"
 					print data2
 					if "results" in data2.keys():
-						print "in result"
+								print "in result"
 
 								print i.get("original_title")
 								f=open('Comedy'+str(year)+'Cast.csv', 'a')
@@ -152,15 +152,14 @@ def getmoviesbyyear():
 																	latinosupport=latinosupport+1
 																else:
 																	latinolead=latinolead+1
-													else:	
-														if imdbid == None:
-															imdbid = ""
-															wikipedialist[imdbid]=[str(j.get("name")),pob]
-															#wikipedialist[0].append([str(j.get("name")),imdbid])
-														else:
-															imdbid = str(imdbid)[2:]
-															#wikipedialist[1].append([str(j.get("name")),imdbid])
-															wikipedialist[imdbid]=[str(j.get("name")),pob]
+													if imdbid == None:
+														imdbid = ""
+														wikipedialist[0].append([str(j.get("name")),imdbid,pob])
+														#wikipedialist[0].append([str(j.get("name")),imdbid])
+													else:
+														imdbid = str(imdbid)[2:]
+														#wikipedialist[1].append([str(j.get("name")),imdbid])
+														wikipedialist[1].append([str(j.get("name")),imdbid,pob])
 
 												print "pob",pob
 

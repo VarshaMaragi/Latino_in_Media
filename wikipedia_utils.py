@@ -90,11 +90,11 @@ def get_pages(actors):
 		if wiki_id == "":
 			missing_actors.append(a)
 		elif imdb_id == "":
-			unsure_actors.append([a[0], a[1], wiki_id])
+			unsure_actors.append([a[0], a[1], wiki_id, a[2]])
 		elif imdb_id != a[1]:
 			missing_actors.append(a)
 		else:
-			found_actors.append([a[0], a[1], wiki_id])	
+			found_actors.append([a[0], a[1], wiki_id, a[2]])	
 	return missing_actors,unsure_actors, found_actors
 
 def get_pages_no_imdb(actors):
@@ -115,9 +115,9 @@ def get_pages_no_imdb(actors):
 		if wiki_id == "":
 			missing_actors.append(a)
 		elif keep_description(description):
-			found_actors.append([a[0], None, wiki_id])
+			found_actors.append([a[0], None, wiki_id, a[2]])
 		else:
-			unsure_actors.append([a[0], None, wiki_id])	
+			unsure_actors.append([a[0], None, wiki_id, a[2]])	
 	return missing_actors,unsure_actors, found_actors
 
 def get_plain_text(actors):

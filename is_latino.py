@@ -22,15 +22,23 @@ def get_wiki_info(actors_imdb, actors_without_imdb):
 	unsure = unsure_a + unsure_b
 	found = found_a + found_b
 	actors_wiki = []
+	actors_wiki_without_bp = []
 	wiki_labels = {}
 	wiki_sentences = {}
+	bp_dict = {}
 	for a in found:
 		actors_wiki.append([a[0], a[2]])
 		wiki_labels[a[2]] = []
 		wiki_sentences[a[2]] = []
+		if a[3] != None and a[3] != "":
+			bp_dict[a[2]] = a[3]
+			actors_wiki_without_bp.append([a[0], a[2]])
+
 
 	#VERY TEMPORARY
-	bp_dict = get_bp_dict(actors_wiki, found)
+	bp_dict.update(get_bp_dict(actors_wiki_without_bp, found))
+	print (bp_dict)
+	print (len(bp_dict))
 
 	wiki_labels = wiki.get_categories(found)
 	wiki_sentences = wiki.get_plain_text(found)
@@ -115,6 +123,7 @@ def is_latino(labels, sentences, birth_place):
 		return "Not Latino"
 	
 	return 'Unknown'
+	# tag of descent, has descent, a parent is of descent
 
 def update_csv(latino_dict, actor_info_dict):
 	str_cast = ""
