@@ -6,11 +6,13 @@ import codecs
 import sys
 import time
 import requests
+from imp import reload
+import urllib.request
 
 
 #LA_COUNTRIES = ["Cuba", "Dominican Republic","Puerto Rico", "Costa Rica", "El Salvador", "Guatemala", "Honduras", "Mexico", "Nicaragua", "Panama", "Argentina", "Bolivia", "Chile", "Colombia", "Ecuador",  "Guyana", "Paraguay", "Peru", "Uruguay", "Venezuela"]
 reload(sys)
-sys.setdefaultencoding('utf8')
+#sys.setdefaultencoding('utf8')
 def getmoviesbyyear():
 	dcode=dict()
 	totalactors=0
@@ -31,38 +33,38 @@ def getmoviesbyyear():
 	foverview=open('movieoverview.txt','a')
 	LA_COUNTRIES=re.compile(".*Cuba.*|.*Dominican Republic.*|.*Puerto Rico.*|.*Costa Rica.*|.*El Salvador.*|.*Guatemala.*|.*Mexico.*|.*Nicaragua.*|.*Panama.*|.*Argentina.*|.*Nicaragua.*|.*Bolivia.*|.*Chile.*|.*Colombia.*|.*Ecuador.*|.*Guyana.*|.*Paraguay.*|.*Peru.*|.*Uruguay.*|.*Venezuela.*")
 	LA_NAMES=re.compile(".*ez$|.*do$|.*ro$")
-	year=raw_input("Enter year: ")
-	g=raw_input("Entre the genre: ")
+	year=input("Enter year: ")
+	g=input("Entre the genre: ")
 	genre=dcode.get(g)
 	pc=[1,2,3,4,5,6,7,8,9,11,12,13,14,16,17,25,8411]
 	for productioncompany in pc:
 		print("production compnay number",productioncompany)
 		url="https://api.themoviedb.org/3/discover/movie?api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c&language=en-US&region=US&sort_by=popularity.desc&include_adult=false&include_video=false&primary_release_year="+str(year)+"&with_genres=35&year="+str(year)+"&without_genres=28,12,16,18,80,99,18,10751,14,36,27,10402,9648,10749,878,10770,53,37,10752&with_original_language=en&certification_country=US&with_companies="+str(productioncompany)
-		urllib.urlretrieve (url,"year2017.json");
+		urllib.request.urlretrieve (url,"year2017.json");
 		with open('year2017.json') as data_file:
 			data = json.load(data_file)
 			print("Total Pages",data["total_pages"])
 			
 			for i in range(1,data["total_pages"]+1):
-				print "Page",i
-				print "-------------------------------------------"
+				print ("Page",i)
+				print ("-------------------------------------------")
 				time.sleep(3)
 				url="https://api.themoviedb.org/3/discover/movie?api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c&language=en-US&region=US&sort_by=popularity.desc&include_adult=false&include_video=false&page="+str(i)+"&primary_release_year="+str(year)+"&with_genres=35&year="+str(year)+"&without_genres=28,12,16,18,80,99,18,10751,14,36,27,10402,9648,10749,878,10770,53,37,10752&with_original_language=en&certification_country=US&with_companies="+str(productioncompany)
-				urllib.urlretrieve (url,"year2017.json");
+				urllib.request.urlretrieve (url,"year2017.json");
 			
 
 				with open('year2017.json') as data_file2:
 					f=open('Comedy'+str(year)+'Cast.csv', 'a')
 					g=open('Comedy'+str(year)+'Crew.csv','a')
 					data2 = json.load(data_file2)
-					print "data2"
-					print data2
+					print ("data2")
+					print (data2)
 					if "results" in data2.keys():
-						print "in results"
+						print ("in results")
 						for i in data2["results"]:
 							if i.get("original_language")=="en":
 
-								print i.get("original_title")
+								print (i.get("original_title"))
 							
 								s=(i.get("original_title").encode('utf-8','ignore').decode('utf-8'))
 								#s=unicode(s.strip(codecs.BOM_UTF8), 'utf-8')
@@ -71,7 +73,7 @@ def getmoviesbyyear():
 								g.write("//Movie title//\n")
 								g.write(s)
 								rescast=i.get("id")
-								print str(rescast)
+								print (str(rescast))
 								overviewmovie=i.get("overview")
 								print("overview",str(overviewmovie))
 								overviewlist.append(str(overviewmovie))
@@ -81,7 +83,7 @@ def getmoviesbyyear():
 								if LA_COUNTRIES.findall(overviewmovie) or LA_NAMES.findall(overviewmovie):
 									for startwithcap in LA_COUNTRIES.findall(overviewmovie):
 										if startwithcap.istitle():
-											print startwithcap
+											print (startwithcap)
 											f.write("\n")
 											f.write("possible Latino movie")
 											f.write("\n")
@@ -90,7 +92,7 @@ def getmoviesbyyear():
 											g.write("\n")
 									for startwithcap in LA_NAMES.findall(overviewmovie):
 										if startwithcap.istitle():
-											print startwithcap
+											print (startwithcap)
 											f.write("\n")
 											f.write("possible Latino movie")
 											f.write("\n")
@@ -102,7 +104,7 @@ def getmoviesbyyear():
 
 								#time.sleep(2)
 								url2="https://api.themoviedb.org/3/movie/"+str(rescast)+"/casts?api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c"
-								urllib.urlretrieve (url2,"./cast2017.json");
+								urllib.request.urlretrieve (url2,"./cast2017.json");
 								with open('cast2017.json') as data_file2:
 									datac = json.load(data_file2)
 									strtemp="" 
@@ -115,11 +117,11 @@ def getmoviesbyyear():
 											attachleadornot=""
 											attachnamebased=""
 											imdbid=""
-											print j.get("name")
+											print (j.get("name"))
 											tmdbid=j.get("id")
 											time.sleep(1)
 											urlimdb="https://api.themoviedb.org/3/person/"+str(tmdbid)+"/external_ids?api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c&language=en-US"
-											urllib.urlretrieve(urlimdb,"./actorimdb.json")
+											urllib.request.urlretrieve(urlimdb,"./actorimdb.json")
 											with open('actorimdb.json') as data_fileimdb:
 												temp=json.load(data_fileimdb)
 												if "imdb_id" in temp.keys():
@@ -135,7 +137,7 @@ def getmoviesbyyear():
 												gensupport=gensupport+1
 											if LA_NAMES.findall(j.get("name")):
 												attachnamebased="Latinx"
-												print "order",j.get("order")
+												print ("order",j.get("order"))
 												latinoactors=latinoactors+1
 												flag=1
 												if j.get("order")>2:
@@ -146,7 +148,7 @@ def getmoviesbyyear():
 								
 											time.sleep(1)
 											url3="https://api.themoviedb.org/3/person/"+str(j.get("id"))+"?api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c&language=en-US"
-											urllib.urlretrieve(url3,"./placeofbirth.json")
+											urllib.request.urlretrieve(url3,"./placeofbirth.json")
 											pob=""
 											pp=""
 											attach=""
@@ -168,17 +170,20 @@ def getmoviesbyyear():
 																else:
 																	latinolead=latinolead+1
 													if imdbid == None:
-														imdbid = ""
-														wikipedialist[0].append([str(j.get("name")),imdbid,pob])
-														#wikipedialist[0].append([str(j.get("name")),imdbid])
+														pob_2 = ""
+														if pob == None:
+															pob_2 = str(pob)
+														imdbid_2 = ""
+														wikipedialist[0].append([str(j.get("name")),imdbid_2,pob_2])
 													else:
-														imdbid = str(imdbid)[2:]
-														#wikipedialist[1].append([str(j.get("name")),imdbid])
-														wikipedialist[1].append([str(j.get("name")),imdbid,pob])
+														pob_2 = ""
+														if pob == None:
+															pob_2 = str(pob)
+														imdbid_2 = str(imdbid)[2:]
+														wikipedialist[1].append([str(j.get("name")),imdbid_2,pob_2])
 
-														#wikipedialist.append((j.get("name"),imdbid))
 
-												print "pob",pob
+												print ("pob",pob)
 
 												if "profile_path" in dataperson.keys():
 													if dataperson["profile_path"]!=None:
@@ -191,13 +196,13 @@ def getmoviesbyyear():
 										for j in datac["crew"]:
 											attachnamebased=""
 
-											print j.get("name")
+											print (j.get("name"))
 											if LA_NAMES.findall(j.get("name")):
 												attachnamebased="Latinx"
 											#strtemp2=strtemp2+j.get("name").encode('utf-8')+"\t\t"+j.get("job").encode('utf-8')+"\n"
 											time.sleep(1)
 											url3="https://api.themoviedb.org/3/person/"+str(j.get("id"))+"?api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c&language=en-US"
-											urllib.urlretrieve(url3,"./placeofbirth.json")
+											urllib.request.urlretrieve(url3,"./placeofbirth.json")
 											pob=""
 											pp=""
 											attach=""
@@ -212,7 +217,7 @@ def getmoviesbyyear():
 														if LA_COUNTRIES.findall(pob):
 														
 															attach="Latinx"
-												print "pob",pob
+												print ("pob",pob)
 												#if not pob:
 
 												if "profile_path" in dataperson.keys():
@@ -249,9 +254,9 @@ def getmoviesbyyear():
 		if overviewlist:
 			print("overviewlist",overviewlist)
 			#MovieClassification.classifyLandNL(overviewlist)
-		print ('\n')
-		print(wikipedialist)
-		return wikipedialist
+	print ('\n')
+	print(wikipedialist)
+	return wikipedialist
 		
 
 
@@ -261,7 +266,7 @@ def getmoviesdirect():
 	url = 'http://api.themoviedb.org'
 	params = '/3/discover/movie?with_genres=35&primary_release_year=2017&page=1&include_video=false&include_adult=false&sort_by=vote_count.desc&language=en    -US&api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c'
 	result = requests.get(str(url + params), headers = {}).json()
-	print result
+	print (result)
 	print (type(data))
 	print(data.decode("utf-8"))
 	print ("----------------------------------------")
@@ -270,8 +275,8 @@ def getmoviesdirect():
 def main():
 	getmoviesbyyear()
 
-if __name__ == '__main__':
-	try:
-		main()
-	except Exception,e:
-		print(e)
+#if __name__ == '__main__':
+#	try:
+#		main()
+#	except Exception,e:
+#		print(e)

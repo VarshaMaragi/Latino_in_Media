@@ -1,12 +1,13 @@
 import wikipedia_utils as wiki
 from unknown import getmoviesbyyear
+#from YearlyComedyCollection import getmoviesbyyear
 import csv
 from countries_constants import *
 from past_actors import *
 import ethnicity_utils as ethni
 
 def main():
-	actors_without_bp  = getmoviesbyyear
+	actors_without_bp  = getmoviesbyyear#()
 	print(str(len(actors_without_bp[1]) + len(actors_without_bp[0])))
 	latino_dict, actor_info = get_wiki_info(actors_without_bp[1], actors_without_bp[0])
 	update_csv(latino_dict, actor_info)
@@ -30,8 +31,9 @@ def get_wiki_info(actors_imdb, actors_without_imdb):
 		actors_wiki.append([a[0], a[2]])
 		wiki_labels[a[2]] = []
 		wiki_sentences[a[2]] = []
-		if a[3] != None and a[3] != "":
+		if a[3] != None and a[3] != "" and a[3] != "None":
 			bp_dict[a[2]] = a[3]
+		else:
 			actors_wiki_without_bp.append([a[0], a[2]])
 
 
@@ -58,10 +60,10 @@ def get_wiki_info(actors_imdb, actors_without_imdb):
 			bp = bp_dict[a[2]]
 		if a[2] in past_actors_latino:
 			from_old_files = True
-			latino_dict[a[0]] = True
+			latino_dict[a[0]] = 'Latino'
 		elif a[2] in past_actors_not_latino:
 			from_old_files = True
-			latino_dict[a[0]] = False
+			latino_dict[a[0]] = 'Not Latino'
 		else:
 			latino_dict[a[0]] = is_latino(labels, sentences, bp)	
 		actor_info[a[0]] = {
@@ -130,12 +132,16 @@ def update_csv(latino_dict, actor_info_dict):
 	with open('Comedy2017Cast.csv', 'r+') as csvfile:
 		spamreader = csv.reader(csvfile, delimiter=';', quotechar='|')
 		for row in spamreader:
+			print (row)
 			latino = "Unknown"
+			if len(row) == 1 and (row[0] == '0' or row[0] == '00'):
+				continue
 			if len(row) == 0:
 				str_cast += '\n'
 				continue
 			if len(row) >= 3 and row[0] in latino_dict:
-				row.append(latino_dict[row[0]])
+				row[5] = latino_dict[row[0]]
+				row[2] = actor_info_dict[row[0]]['birthplace']
 				latino = latino_dict[row[0]]
 			for i in range(len(row)-1):
 				str_cast += row[i] + ';'
@@ -149,6 +155,7 @@ def update_csv(latino_dict, actor_info_dict):
 				filename += 'latino.txt'
 				print_actor(row[0], actor_info_dict[row[0]], latino, filename)
 		csvfile.seek(0)
+		print (str_cast)
 		csvfile.write(str_cast)
 		csvfile.truncate()
 	str_crew = ""
