@@ -1,13 +1,19 @@
 import wikipedia_utils as wiki
-from unknown import getmoviesbyyear
-#from YearlyComedyCollection import getmoviesbyyear
+#from unknown import getmoviesbyyear
+from YearlyComedyCollection import getmoviesbyyear
 import csv
 from countries_constants import *
 from past_actors import *
 import ethnicity_utils as ethni
 
+YEAR = ""
+
 def main():
-	actors_without_bp  = getmoviesbyyear#()
+	global YEAR
+	out  = getmoviesbyyear()
+	YEAR = out[0]
+	print (YEAR)
+	actors_without_bp  = out[1] 
 	print(str(len(actors_without_bp[1]) + len(actors_without_bp[0])))
 	latino_dict, actor_info = get_wiki_info(actors_without_bp[1], actors_without_bp[0])
 	update_csv(latino_dict, actor_info)
@@ -36,8 +42,6 @@ def get_wiki_info(actors_imdb, actors_without_imdb):
 		else:
 			actors_wiki_without_bp.append([a[0], a[2]])
 
-
-	#VERY TEMPORARY
 	bp_dict.update(get_bp_dict(actors_wiki_without_bp, found))
 	print (bp_dict)
 	print (len(bp_dict))
@@ -129,13 +133,10 @@ def is_latino(labels, sentences, birth_place):
 
 def update_csv(latino_dict, actor_info_dict):
 	str_cast = ""
-	with open('Comedy2017Cast.csv', 'r+') as csvfile:
+	with open('Comedy'+YEAR+'Cast.csv', 'r+') as csvfile:
 		spamreader = csv.reader(csvfile, delimiter=';', quotechar='|')
 		for row in spamreader:
-			print (row)
 			latino = "Unknown"
-			if len(row) == 1 and (row[0] == '0' or row[0] == '00'):
-				continue
 			if len(row) == 0:
 				str_cast += '\n'
 				continue
@@ -147,7 +148,7 @@ def update_csv(latino_dict, actor_info_dict):
 				str_cast += row[i] + ';'
 			str_cast += row[len(row)-1] + '\n'
 			if row[0] in actor_info_dict:
-				filename = '2017_'
+				filename = YEAR + '_cast_'
 				if latino == 'Not Latino':
 					filename += 'not_'
 				if latino == 'Unknown':
@@ -155,23 +156,34 @@ def update_csv(latino_dict, actor_info_dict):
 				filename += 'latino.txt'
 				print_actor(row[0], actor_info_dict[row[0]], latino, filename)
 		csvfile.seek(0)
-		print (str_cast)
 		csvfile.write(str_cast)
 		csvfile.truncate()
 	str_crew = ""
-	with open('Comedy2017Crew.csv', 'r+') as csvfile:
+	with open('Comedy'+YEAR+'Crew.csv', 'r+') as csvfile:
 		spamreader = csv.reader(csvfile, delimiter=';', quotechar='|')
 		for row in spamreader:
+			latino = "Unknown"
 			if len(row) == 0:
-				str_crew += '\n'
+				str_cast += '\n'
 				continue
-			if len(row) < 3 and row[0] in latino_dict:
-				row.append(latino_dict[row[0]])
+			if len(row) >= 3 and row[0] in latino_dict:
+				row[5] = latino_dict[row[0]]
+				row[2] = actor_info_dict[row[0]]['birthplace']
+				latino = latino_dict[row[0]]
 			for i in range(len(row)-1):
-				str_crew += row[i] + ';'
-			str_crew += row[len(row)-1] + '\n'
+				str_cast += row[i] + ';'
+			str_cast += row[len(row)-1] + '\n'
+			if row[0] in actor_info_dict:
+				print ('YES')
+				filename = YEAR + '_crew_'
+				if latino == 'Not Latino':
+					filename += 'not_'
+				if latino == 'Unknown':
+					filename += 'unknown_'
+				filename += 'latino.txt'
+				print_actor(row[0], actor_info_dict[row[0]], latino, filename)
 		csvfile.seek(0)
-		csvfile.write(str_crew)
+		csvfile.write(str_cast)
 		csvfile.truncate()
 
 

@@ -256,7 +256,8 @@ def getmoviesbyyear():
 			#MovieClassification.classifyLandNL(overviewlist)
 	print ('\n')
 	print(wikipedialist)
-	return wikipedialist
+	print ("YEAR: " + str(year))
+	return (str(year), wikipedialist)
 		
 
 
