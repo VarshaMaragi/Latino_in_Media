@@ -29,6 +29,7 @@ def getmoviesbyyear():
 	dcode["documentary"]=99
 	dcode["drama"]=18
 	wikipedialist=[[],[]]
+	wikipedialistcrew=[[],[]]
 	overviewlist=list()
 	foverview=open('movieoverview.txt','a')
 	LA_COUNTRIES=re.compile(".*Cuba.*|.*Dominican Republic.*|.*Puerto Rico.*|.*Costa Rica.*|.*El Salvador.*|.*Guatemala.*|.*Mexico.*|.*Nicaragua.*|.*Panama.*|.*Argentina.*|.*Nicaragua.*|.*Bolivia.*|.*Chile.*|.*Colombia.*|.*Ecuador.*|.*Guyana.*|.*Paraguay.*|.*Peru.*|.*Uruguay.*|.*Venezuela.*")
@@ -37,6 +38,8 @@ def getmoviesbyyear():
 	g=input("Entre the genre: ")
 	genre=dcode.get(g)
 	pc=[1,2,3,4,5,6,7,8,9,11,12,13,14,16,17,25,8411]
+	f=open('Comedy'+str(year)+'Cast.csv', 'a')
+	g=open('Comedy'+str(year)+'Crew.csv','a')
 	for productioncompany in pc:
 		print("production compnay number",productioncompany)
 		url="https://api.themoviedb.org/3/discover/movie?api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c&language=en-US&region=US&sort_by=popularity.desc&include_adult=false&include_video=false&primary_release_year="+str(year)+"&with_genres=35&year="+str(year)+"&without_genres=28,12,16,18,80,99,18,10751,14,36,27,10402,9648,10749,878,10770,53,37,10752&with_original_language=en&certification_country=US&with_companies="+str(productioncompany)
@@ -54,8 +57,7 @@ def getmoviesbyyear():
 			
 
 				with open('year2017.json') as data_file2:
-					f=open('Comedy'+str(year)+'Cast.csv', 'a')
-					g=open('Comedy'+str(year)+'Crew.csv','a')
+					
 					data2 = json.load(data_file2)
 					print ("data2")
 					print (data2)
@@ -195,8 +197,18 @@ def getmoviesbyyear():
 
 										for j in datac["crew"]:
 											attachnamebased=""
-
+											imdbid=""
 											print (j.get("name"))
+											time.sleep(1)
+											urlimdb="https://api.themoviedb.org/3/person/"+str(tmdbid)+"/external_ids?api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c&language=en-US"
+											urllib.request.urlretrieve(urlimdb,"./actorimdb.json")
+											with open('actorimdb.json') as data_fileimdb:
+												temp=json.load(data_fileimdb)
+												if "imdb_id" in temp.keys():
+													imdbid=temp["imdb_id"]
+												if "facebook_id" in temp.keys():
+													facebook_id=temp["facebook_id"]
+													print("Facebook id",facebook_id)
 											if LA_NAMES.findall(j.get("name")):
 												attachnamebased="Latinx"
 											#strtemp2=strtemp2+j.get("name").encode('utf-8')+"\t\t"+j.get("job").encode('utf-8')+"\n"
@@ -217,6 +229,19 @@ def getmoviesbyyear():
 														if LA_COUNTRIES.findall(pob):
 														
 															attach="Latinx"
+													if imdbid == None:
+														pob_2 = ""
+														if pob == None:
+															pob_2 = str(pob)
+														imdbid_2 = ""
+														wikipedialistcrew[0].append([str(j.get("name")),imdbid_2,pob_2])
+													else:
+														pob_2 = ""
+														if pob == None:
+															pob_2 = str(pob)
+														imdbid_2 = str(imdbid)[2:]
+														wikipedialistcrew[1].append([str(j.get("name")),imdbid_2,pob_2])
+
 												print ("pob",pob)
 												#if not pob:
 
@@ -240,24 +265,24 @@ def getmoviesbyyear():
 							
 		#print(totalactors)
 		#print(latinoactors)
-		f.write(str(totalactors))
-		f.write("\n")
-		f.write(str(latinoactors))
-		f.write("\n")
-		f.write(str(latinolead))
-		f.write("\n")
-		f.write(str(genlead))
-		f.write("\n")
-		f.write(str(gensupport))
-		f.write("\n")
-		f.write(str(latinosupport))
-		if overviewlist:
-			print("overviewlist",overviewlist)
-			#MovieClassification.classifyLandNL(overviewlist)
+	f.write(str(totalactors))
+	f.write("\n")
+	f.write(str(latinoactors))
+	f.write("\n")
+	f.write(str(latinolead))
+	f.write("\n")
+	f.write(str(genlead))
+	f.write("\n")
+	f.write(str(gensupport))
+	f.write("\n")
+	f.write(str(latinosupport))
+		
 	print ('\n')
 	print(wikipedialist)
 	print ("YEAR: " + str(year))
+	print(wikipedialistcrew)
 	return (str(year), wikipedialist)
+
 		
 
 
