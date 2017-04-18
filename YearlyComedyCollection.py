@@ -114,11 +114,14 @@ def getmoviesbyyear():
 									pob=""
 
 									if "cast" in datac.keys():
+
 										for j in datac["cast"]:
 											flag=0
 											attachleadornot=""
 											attachnamebased=""
 											imdbid=""
+											printlead=0
+											
 											print (j.get("name"))
 											tmdbid=j.get("id")
 											time.sleep(1)
@@ -132,11 +135,14 @@ def getmoviesbyyear():
 													facebook_id=temp["facebook_id"]
 													print("Facebook id",facebook_id)
 											if j.get("order")<=2:
+												printlead=1
+
 												genlead=genlead+1
 												print("overview changed")
 												overviewlist[-1]=overviewmovie+str(j.get("name"))
 											else:
 												gensupport=gensupport+1
+												
 											if LA_NAMES.findall(j.get("name")):
 												attachnamebased="Latinx"
 												print ("order",j.get("order"))
@@ -145,8 +151,10 @@ def getmoviesbyyear():
 												if j.get("order")>2:
 														attachleadornot="Not lead"
 														latinosupport=latinosupport+1
+														
 												else:
 													latinolead=latinolead+1
+													
 								
 											time.sleep(1)
 											url3="https://api.themoviedb.org/3/person/"+str(j.get("id"))+"?api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c&language=en-US"
@@ -169,8 +177,10 @@ def getmoviesbyyear():
 																latinoactors=latinoactors+1
 																if j.get("order")>2:
 																	latinosupport=latinosupport+1
+																	
 																else:
 																	latinolead=latinolead+1
+																	
 													if imdbid == None:
 														pob_2 = ""
 														if pob == None:
@@ -195,7 +205,8 @@ def getmoviesbyyear():
 													if dataperson["profile_path"]!=None:
 														pp="http://image.tmdb.org/t/p/w185//"+dataperson["profile_path"]
 												#if not pob:
-											strtemp=strtemp+j.get("name").encode('utf-8','ignore').decode('utf-8')+";"+j.get("character").encode('utf-8','ignore').decode('utf-8')+";"+str(pob)+";"+str(pp)+";"+str(gen)+";"+str(attachnamebased)+";"+str(attach)+";"+str(attachleadornot)+"\n"
+
+											strtemp=strtemp+j.get("name").encode('utf-8','ignore').decode('utf-8')+";"+j.get("character").encode('utf-8','ignore').decode('utf-8')+";"+str(pob)+";"+str(pp)+";"+str(gen)+";"+str(attachnamebased)+";"+str(attach)+";"+str(printlead)+"\n"
 											totalactors=totalactors+1
 											#strtemp=strtemp+j.get("name").encode('utf-8')+"\t\t"+j.get("character").encode('utf-8')+"\n"
 
