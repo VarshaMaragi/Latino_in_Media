@@ -47,6 +47,8 @@ class Crew(object):
 			self.misc.append([name, role, epi_info])
 
 def getTVdetailsby_year(year):
+	wikipedialistcrew=[[],[]]
+	wikipedialist=[[],[]]
 	cast_file=open(str(year) + "TVComedyCast.csv",'a')
 	crew_file=open(str(year) + "TVComedyCrew.csv",'a')
 	cast_file.write(str(year) + '\n')
@@ -97,10 +99,22 @@ def getTVdetailsby_year(year):
 						crew =  {}
 						if "cast" in datac.keys():
 							for j in datac["cast"]:
+								_id = str(j.get("id"))
+								imdb, bp = get_imdb_and_bp(_id)
+								if imdb == "":
+									wikipedialist[0].append([str(j.get("name")),imdb,bp])
+								else:
+									wikipedialist[1].append([str(j.get("name")),imdb,bp])
 								a = Actor(str(j.get("name")), str(j.get("character")))
 								actors[str(j.get("character"))] = [a, 0, 6000, -1]
 						if "crew" in datac.keys():
 							for j in datac["crew"]:
+								_id = str(j.get("id"))
+								imdb, bp = get_imdb_and_bp(_id)
+								if imdb == "":
+									wikipedialistcrew[0].append([str(j.get("name")),imdb,bp])
+								else:
+									wikipedialistcrew[1].append([str(j.get("name")),imdb,bp])
 								crew[str(j.get("name")) + ";" + str(j.get("job"))] = [0, 6000, -1]
 						actors, crew = get_episode_counts(i.get("id"), actors, crew)
 						sorted_actors = [actors[k] for k in actors]
@@ -137,8 +151,10 @@ def getTVdetailsby_year(year):
 
 		cast_file.close()
 		crew_file.close()
+		return (str(year), [wikipedialist[0] + wikipedialistcrew[0], wikipedialist[1] + wikipedialistcrew[1]], False)
 
 def get_episode_counts(_id, cast, crew):
+	return cast, crew
 	episode_list = get_episodes_dict(_id)
 	for x in episode_list:
 		seas_num = x[0]
@@ -184,6 +200,26 @@ def get_episode_counts(_id, cast, crew):
 						else:
 							crew[str(j.get("name")) + ";" + str(j.get("job"))] = [1, air_date, air_date]
 	return cast, crew					
+
+def get_imdb_and_bp(_id):
+	imdb = ""
+	bp = "None"
+	time.sleep(1)
+	url_1="https://api.themoviedb.org/3/person/"+str(_id)
+	url_2 = "?api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c&language=en-US"
+	urlimdb= url_1 +"/external_ids" + url_2
+	urllib.request.urlretrieve(urlimdb,"./actorimdb.json")
+	with open('actorimdb.json') as data_fileimdb:
+		temp=json.load(data_fileimdb)
+		if "imdb_id" in temp.keys():
+			imdb=str(temp["imdb_id"])[2:]
+	urlimdb= url_1 + url_2
+	urllib.request.urlretrieve(urlimdb,"./actorimdb.json")
+	with open('actorimdb.json') as data_fileimdb:
+		temp=json.load(data_fileimdb)
+		if "place_of_birth" in temp.keys():
+			bp=(temp["place_of_birth"])
+	return imdb, bp					
 
 def get_episodes_dict(_id):
 	seasons = []
@@ -237,7 +273,8 @@ def write_headers(cast, crew):
 		crew.write(j + classifications)
 
 def main():
-	getTVdetailsby_year('2016')
+	#getTVdetailsby_year('2016')
+	print(get_imdb_and_bp('5374'))
 
 if __name__ == '__main__':
 	main()

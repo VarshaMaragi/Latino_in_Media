@@ -300,7 +300,7 @@ def getmoviesbyyear():
 	print(wikipedialist)
 	print ("YEAR: " + str(year))
 	print(wikipedialistcrew)
-	return (str(year), [wikipedialist[0] + wikipedialistcrew[0], wikipedialist[1] + wikipedialistcrew[1]])
+	return (str(year), [wikipedialist[0] + wikipedialistcrew[0], wikipedialist[1] + wikipedialistcrew[1]], True)
 
 		
 
