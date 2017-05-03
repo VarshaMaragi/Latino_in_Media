@@ -185,11 +185,15 @@ def getmoviesbyyear():
 														pob_2 = ""
 														if pob == None:
 															pob_2 = str(pob)
+														else:
+															pob_2 = str(pob)
 														imdbid_2 = ""
 														wikipedialist[0].append([str(j.get("name")),imdbid_2,pob_2])
 													else:
 														pob_2 = ""
 														if pob == None:
+															pob_2 = str(pob)
+														else:
 															pob_2 = str(pob)
 														imdbid_2 = str(imdbid)[2:]
 														wikipedialist[1].append([str(j.get("name")),imdbid_2,pob_2])
@@ -245,13 +249,21 @@ def getmoviesbyyear():
 														pob_2 = ""
 														if pob == None:
 															pob_2 = str(pob)
+														else:
+															pob_2 = str(pob)
 														imdbid_2 = ""
 														wikipedialistcrew[0].append([str(j.get("name")),imdbid_2,pob_2])
 													else:
 														pob_2 = ""
 														if pob == None:
 															pob_2 = str(pob)
+
 														imdbid_2 = str(imdbidcrew)[2:]
+
+														else:
+															pob_2 = str(pob)
+														imdbid_2 = str(imdbid)[2:]
+
 														wikipedialistcrew[1].append([str(j.get("name")),imdbid_2,pob_2])
 
 												print ("pob",pob)
@@ -293,7 +305,7 @@ def getmoviesbyyear():
 	print(wikipedialist)
 	print ("YEAR: " + str(year))
 	print(wikipedialistcrew)
-	return (str(year), wikipedialist)
+	return (str(year), [wikipedialist[0] + wikipedialistcrew[0], wikipedialist[1] + wikipedialistcrew[1]], True)
 
 		
 
@@ -313,7 +325,8 @@ def getmoviesdirect():
 def main():
 	getmoviesbyyear()
 
-#if __name__ == '__main__':
+if __name__ == '__main__':
+	main()
 #	try:
 #		main()
 #	except Exception,e:
