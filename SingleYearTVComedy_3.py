@@ -213,17 +213,18 @@ def update_with_imdb(_id, _title, season_num, _crew, producer_dict):
 	title = m['title'].encode('utf-8')
 	if str(title) != _title:
 		print('\tIncorrect IMDBid ' + str(title)) 
-		return cast, crew, ""
 				
 	if 'genres' in m.keys():	
 		keep_tv = True
+		comedy_show = False
 		genres_names = m["genres"]
-		bad_genres = ["Animation","Reality-TV"]
+		bad_genres = ["Game-Show", "Animation","Reality-TV"]
 		for x in genres_names:
 			if x.encode('utf-8') in bad_genres:
 				keep_tv = False
-				break
-		if not (keep_tv):
+			if "Comedy" in x.encode('utf-8'):
+				comedy_show = True
+		if not (keep_tv) or not comedy_show:
 			print("\tNot keeping: " + _id)
 			return -1, -1, ""
 	
@@ -231,9 +232,9 @@ def update_with_imdb(_id, _title, season_num, _crew, producer_dict):
 	online_distros = ['Netflix', 'Hulu', 'Amazon']
 	if 'distributors' in m.keys():
 		for x in m['distributors']:
-			if x['name'].encode('utf-8') in online_distros:
-				is_online_show = x['name'].encode('utf-8')
-				break
+			for y in online_distros:
+				if y in x['name'].encode('utf-8'):
+					is_online_show +=  x['name'].encode('utf-8') + ' '
 	
 	imdb.update(m, 'episodes')
 	if 'episodes' not in m.keys():
@@ -374,6 +375,9 @@ def get_season_number(_id, _year):
 				creators.append(x["name"].encode('utf-8'))
 		if "seasons" in datac.keys():
 			for s in datac["seasons"]:
+				if int(s["season_number"]) == 0:
+					print('\t Skipping season 0')
+					continue
 				air_date = s["air_date"]
 				if air_date == None:
 					continue
