@@ -2,9 +2,9 @@ import wikipedia_utils as wiki
 #from unknown import getmoviesbyyear
 from YearlyComedyCollection import getmoviesbyyear
 from SingleYearTVComedy import getTVdetailsby_year
-from output2015 import l
-from output2015 import l_actor_info
-from output2015 import l_latino_dict
+from out2014 import l
+#from output2015 import l_actor_info
+#from output2015 import l_latino_dict
 import csv
 from countries_constants import *
 from past_actors import *
@@ -20,17 +20,15 @@ def main():
 	'''
 	YEAR = l[0]
 	print (YEAR)
-	#YEAR = '2017'
-	#print (out)
-	#print (YEAR)
 	actors_without_bp  = l[1] 
 	is_movie = l[2]
 	#actors_without_bp  = getmoviesbyyear
-	#latino_dict, actor_info = get_wiki_info(actors_without_bp[1], actors_without_bp[0])
-	#print(latino_dict)
+	latino_dict, actor_info = get_wiki_info(actors_without_bp[1], actors_without_bp[0])
+	print(latino_dict)
+	print(actor_info)
 	#print(actor_info)
-	latino_dict = l_latino_dict
-	actor_info = l_actor_info
+	#latino_dict = l_latino_dict
+	#actor_info = l_actor_info
 	if is_movie:
 		update_csv_movie(latino_dict, actor_info)
 	else:
@@ -40,6 +38,10 @@ def get_bp_dict(actors_wiki, found):
 	return wiki.get_birthplace(actors_wiki)
 
 def get_wiki_info(actors_imdb, actors_without_imdb):
+	imdb_bios = {}
+	for a in actors_imdb:
+		imdb_bios[a[1]] = a[3]#.encode('utf-8')
+		a[2] = str(a[2])#.encode('utf-8')
 	(missing_a, unsure_a, found_a) = wiki.get_pages(actors_imdb)
 	actors_without_imdb = actors_without_imdb + unsure_a
 	(missing_b, unsure_b, found_b) = wiki.get_pages_no_imdb(actors_without_imdb)
@@ -76,6 +78,8 @@ def get_wiki_info(actors_imdb, actors_without_imdb):
 			labels = wiki_labels[a[2]]
 		if a[2] in wiki_sentences:
 			sentences = wiki_sentences[a[2]]
+		if a[1] in imdb_bios:
+			sentences['IMDb Bio'] = [imdb_bios[a[1]]]
 		if a[2] in bp_dict:
 			bp = bp_dict[a[2]]
 		if a[2] in past_actors_latino:
@@ -216,8 +220,15 @@ def update_csv_tv(latino_dict, actor_info_dict):
 				continue
 			if len(row) >= 3 and row[1] in latino_dict:
 				print("YEA")
-				row[2] = latino_dict[row[1]]
 				latino = latino_dict[row[1]]
+				if latino == "Not Latino":
+					row[2] = '0'
+				elif latino == "Latino":
+					row[2] = '1'	
+				elif latino == "Unknown":
+					row[2] = '-'
+				else:
+					print("ERROR: " + row[1] + latino)
 			for i in range(len(row)-1):
 				str_cast += row[i] + ';'
 			str_cast += row[len(row)-1] + '\n'
@@ -240,16 +251,21 @@ def update_csv_tv(latino_dict, actor_info_dict):
 			if len(row) == 0:
 				str_crew += '\n'
 				continue
-			if len(row) >= 44:
+			if len(row) >= 43:
 				row_line = row[0]+ ';'
-				crew_line = [list(row[1:9]), list(row[9:17]), list(row[17:26]), list(row[26:35]), list(row[35:44])]
-				#print(row)
-				#print(crew_line)
+				crew_line = [list(row[1:9]), list(row[9:17]), list(row[17:26]), list(row[26:35]), list(row[35:43])]
 				for member in crew_line:
-					#print (member)
+					print (member)
 					if member[0] in latino_dict:
-						member[len(member) - 7] = latino_dict[member[0]]
 						latino = latino_dict[member[0]]
+						if latino == "Not Latino":
+							member[len(member) - 7] = '0'
+						elif latino == "Latino":
+							member[len(member) - 7] = '1'	
+						elif latino == "Unknown":
+							member[len(member) - 7] = '-'
+						else:
+							print("ERROR: " + member[1] + latino)
 					if member[0] in actor_info_dict:
 						print ('YES')
 						filename = YEAR + '_crew_'
