@@ -68,7 +68,7 @@ def getTVdetailsby_year(year):
 	crew_file.write(str(year) + '\n')
 	url= URL1 + year + "-01-01&air_date.lte="+ year + "-12-31&page=1" + URL2
 	open_url(url,"TVyear2016.json");
-	skip = True
+	#skip = True
 	with open('TVyear2016.json') as data_file:
 		data = json.load(data_file)
 		total_num = data["total_results"]
@@ -77,7 +77,10 @@ def getTVdetailsby_year(year):
 		write_headers(cast_file, crew_file)
 		
 		for i in range(1, data["total_pages"]+1):
-			print(str(time.time() - start))
+			print("TIME: " + str(time.time() - start))
+			#print(wikipedialist)
+			#print(wikipedialistcrew)
+			#print('\n')
 			url_2 = URL1 + year + "-01-01&air_date.lte="+ year + "-12-31&page=" + str(i) + URL2
 			time.sleep(1)
 			open_url(url_2,"Tvyear2016.json");
@@ -86,10 +89,10 @@ def getTVdetailsby_year(year):
 				data2 = json.load(data_file2)
 				for i in data2["results"]:
 					show_name = i.get("original_name").encode('utf-8')
-					if show_name == "Boomers":
+					'''if show_name == "Boomers":
 						skip = False
 					if skip:
-						continue
+						continue'''
 						
 					genres = i.get("genre_ids")
 					_id = str(i.get("id"))
@@ -203,6 +206,7 @@ def get_producer_dict(_id, season_number):
 	return prod_dict
 
 def update_with_imdb(_id, _title, season_num, _crew, producer_dict):
+	global wikipedialistcrew, wikipedialist
 	cast = {}
 	crew = _crew
 	m = imdb.get_movie(_id)
@@ -265,6 +269,15 @@ def update_with_imdb(_id, _title, season_num, _crew, producer_dict):
 						crew[p_key][2] = air_date
 				else:
 					crew[p_key] = [1, air_date, air_date]
+					imdb.update(k)
+					imdb_id = k.personID
+					bio = ""
+					notes = ""
+					if 'biography' in k.keys():
+						bio = k['biography']
+					if 'birth notes' in k.keys():
+						notes = k['birth notes']
+					wikipedialistcrew[1].append([name,imdb_id,notes,bio])
 		
 		if 'writer' in e.keys():
 			for k in e['writer']:
@@ -277,6 +290,15 @@ def update_with_imdb(_id, _title, season_num, _crew, producer_dict):
 						crew[p_key][2] = air_date
 				else:
 					crew[p_key] = [1, air_date, air_date]
+					imdb.update(k)
+					imdb_id = k.personID
+					bio = ""
+					notes = ""
+					if 'biography' in k.keys():
+						bio = k['biography']
+					if 'birth notes' in k.keys():
+						notes = k['birth notes']
+					wikipedialistcrew[1].append([name,imdb_id,notes,bio])
 		
 		if 'director' in e.keys():
 			for k in e['director']:
@@ -289,6 +311,15 @@ def update_with_imdb(_id, _title, season_num, _crew, producer_dict):
 						crew[p_key][2] = air_date
 				else:
 					crew[p_key] = [1, air_date, air_date]
+					imdb.update(k)
+					imdb_id = k.personID
+					bio = ""
+					notes = ""
+					if 'biography' in k.keys():
+						bio = k['biography']
+					if 'birth notes' in k.keys():
+						notes = k['birth notes']
+					wikipedialistcrew[1].append([name,imdb_id,notes,bio])
 				
 
 		if 'cast' not in e.keys():
@@ -320,6 +351,16 @@ def update_with_imdb(_id, _title, season_num, _crew, producer_dict):
 					uncredited = True
 				a = Actor(name, role, uncredited)
 				cast[k] = [a, 1, air_date, air_date]
+				imdb.update(p)
+				imdb_id = p.personID
+				bio = ""
+				notes = ""
+				if 'biography' in p.keys():
+					bio = p['biography']
+				if 'birth notes' in p.keys():
+					notes = p['birth notes']
+				wikipedialist[1].append([name,imdb_id,notes,bio])
+
 	return cast, crew, is_online_show
 
 def get_season_number(_id, _year):
