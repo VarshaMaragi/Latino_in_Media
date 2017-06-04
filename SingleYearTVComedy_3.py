@@ -71,106 +71,106 @@ def getTVdetailsby_year(year):
 	#skip = True
 	with open('TVyear2016.json') as data_file:
 		data = json.load(data_file)
-	total_num = data["total_results"]
-	cast_file.write(";Total Comedies: " + str(total_num) + '\n\n')
-	crew_file.write(";Total Comedies: " + str(total_num) + '\n\n')
-	write_headers(cast_file, crew_file)
-	
-	for i in range(1, data["total_pages"]+1):
-		print("TIME: " + str(time.time() - start))
-		#print(wikipedialist)
-		#print(wikipedialistcrew)
-		#print('\n')
-		url_2 = URL1 + year + "-01-01&air_date.lte="+ year + "-12-31&page=" + str(i) + URL2
-		time.sleep(1)
-		open_url(url_2,"Tvyear2016.json");
-
-		with open('Tvyear2016.json') as data_file2:
-			data2 = json.load(data_file2)
-		for i in data2["results"]:
-			show_name = i.get("original_name").encode('utf-8')
-			'''if show_name == "Boomers":
-				skip = False
-			if skip:
-				continue'''
-				
-			genres = i.get("genre_ids")
-			_id = str(i.get("id"))
-			if (show_name == "Saturday Night Live"):
-				continue
-			strs=""
-			keep_tv = True
-			bad_genres = [10767, 10770, 10763]
-			for x in genres:
-				if x in bad_genres:
-					keep_tv = False
-					break
-			if not (keep_tv):
-				print("Not keeping: " + show_name)
-				continue
-			print(show_name+ " " + _id)
-
-			season_num, creators = get_season_number(_id,year)
-			if season_num == "":
-				print ("\tNO SEAS NUM:" + show_name)
-				continue
-
-			print("\tSeason: " + str(season_num))
-			time.sleep(1)
-			url2="https://api.themoviedb.org/3/tv/"+_id+"/season/"+str(season_num)+"?api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c&language=en-US"
-			open_url(url2,"./cast2017.json");
-			with open('cast2017.json') as data_file2:
-				datac = json.load(data_file2)
-			cast = {}
-			crew =  {}
-			for x in creators:
-				crew[x + ";Creator"] = [1, int(year), int(year) + 1]
-			imdbid = get_imdbid(_id)
-			print("\tIMDB: " + imdbid)
-			if imdbid == "":
-				print("BAD ID")
-				continue
-			producer_dict = get_producer_dict(_id, season_num)
-			cast, crew, distributor = update_with_imdb(imdbid, show_name, season_num, crew, producer_dict)
-			if cast == -1 and crew == -1:
-				continue
-			
-			cast_file.write(show_name+'\n')
-			crew_file.write(show_name+'\n')
-			if distributor != "":
-				cast_file.write("Online Show: " + distributor+'\n')
-				crew_file.write("Online Show: " + distributor+'\n')
+		total_num = data["total_results"]
+		cast_file.write(";Total Comedies: " + str(total_num) + '\n\n')
+		crew_file.write(";Total Comedies: " + str(total_num) + '\n\n')
+		write_headers(cast_file, crew_file)
 		
+		for i in range(1, data["total_pages"]+1):
+			print("TIME: " + str(time.time() - start))
+			#print(wikipedialist)
+			#print(wikipedialistcrew)
+			#print('\n')
+			url_2 = URL1 + year + "-01-01&air_date.lte="+ year + "-12-31&page=" + str(i) + URL2
+			time.sleep(1)
+			open_url(url_2,"Tvyear2016.json");
 
-			sorted_actors = [cast[k] for k in cast]
-			def get_epi_num(x):
-				if len(x) < 2:
-					return 0
-				if x[1] == None or x[1] == "":
-					return 0
-				return x[1]
-			sorted_actors = sorted(sorted_actors, key=get_epi_num, reverse=True) 
-			for info in sorted_actors:
-				a = info[0]
-				a.epi_num = info[1]
-				a.start = str(info[2])
-				a.end = str(info[3])
-				write_actor(cast_file, a)
-			sorted_crew = [[k.split(";")[0], k.split(";")[1], crew[k]] for k in crew]
-			def get_epi_num_crew(x):
-				if x[2][0] == None or x[2][0] == "":
-					return 0
-				return x[2][0]
-			sorted_crew = sorted(sorted_crew, key=get_epi_num_crew, reverse=True) 
-			crew_obj = Crew()
-			for info in sorted_crew:
-				name = info[0]
-				role = info[1]
-				epi_info = info[2]
-				crew_obj.add_crew_member(name, role, epi_info)
-			write_crew(crew_file, crew_obj)
-			cast_file.write("\n")
-			crew_file.write("\n")
+			with open('Tvyear2016.json') as data_file2:
+				data2 = json.load(data_file2)
+				for i in data2["results"]:
+					show_name = i.get("original_name").encode('utf-8')
+					'''if show_name == "Boomers":
+						skip = False
+					if skip:
+						continue'''
+						
+					genres = i.get("genre_ids")
+					_id = str(i.get("id"))
+					if (show_name == "Saturday Night Live"):
+						continue
+					strs=""
+					keep_tv = True
+					bad_genres = [10767, 10770, 10763]
+					for x in genres:
+						if x in bad_genres:
+							keep_tv = False
+							break
+					if not (keep_tv):
+						print("Not keeping: " + show_name)
+						continue
+					print(show_name+ " " + _id)
+
+					season_num, creators = get_season_number(_id,year)
+					if season_num == "":
+						print ("\tNO SEAS NUM:" + show_name)
+						continue
+
+					print("\tSeason: " + str(season_num))
+					time.sleep(1)
+					url2="https://api.themoviedb.org/3/tv/"+_id+"/season/"+str(season_num)+"?api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c&language=en-US"
+					open_url(url2,"./cast2017.json");
+					with open('cast2017.json') as data_file2:
+						datac = json.load(data_file2)
+						cast = {}
+						crew =  {}
+						for x in creators:
+							crew[x + ";Creator"] = [1, int(year), int(year) + 1]
+						imdbid = get_imdbid(_id)
+						print("\tIMDB: " + imdbid)
+						if imdbid == "":
+							print("BAD ID")
+							continue
+						producer_dict = get_producer_dict(_id, season_num)
+						cast, crew, distributor = update_with_imdb(imdbid, show_name, season_num, crew, producer_dict)
+						if cast == -1 and crew == -1:
+							continue
+						
+						cast_file.write(show_name+'\n')
+						crew_file.write(show_name+'\n')
+						if distributor != "":
+							cast_file.write("Online Show: " + distributor+'\n')
+							crew_file.write("Online Show: " + distributor+'\n')
+				
+
+						sorted_actors = [cast[k] for k in cast]
+						def get_epi_num(x):
+							if len(x) < 2:
+								return 0
+							if x[1] == None or x[1] == "":
+								return 0
+							return x[1]
+						sorted_actors = sorted(sorted_actors, key=get_epi_num, reverse=True) 
+						for info in sorted_actors:
+							a = info[0]
+							a.epi_num = info[1]
+							a.start = str(info[2])
+							a.end = str(info[3])
+							write_actor(cast_file, a)
+						sorted_crew = [[k.split(";")[0], k.split(";")[1], crew[k]] for k in crew]
+						def get_epi_num_crew(x):
+							if x[2][0] == None or x[2][0] == "":
+								return 0
+							return x[2][0]
+						sorted_crew = sorted(sorted_crew, key=get_epi_num_crew, reverse=True) 
+						crew_obj = Crew()
+						for info in sorted_crew:
+							name = info[0]
+							role = info[1]
+							epi_info = info[2]
+							crew_obj.add_crew_member(name, role, epi_info)
+						write_crew(crew_file, crew_obj)
+					cast_file.write("\n")
+					crew_file.write("\n")
 
 
 
