@@ -212,15 +212,16 @@ def getmoviesbyyear():
 
 										for j in datac["crew"]:
 											attachnamebased=""
-											imdbid=""
+											
 											print (j.get("name"))
 											time.sleep(1)
 											urlimdb="https://api.themoviedb.org/3/person/"+str(tmdbid)+"/external_ids?api_key=17ce03ebb1e89f2dcf4eec0e9c2b8e6c&language=en-US"
 											urllib.request.urlretrieve(urlimdb,"./actorimdb.json")
+											imdbidcrew=""
 											with open('actorimdb.json') as data_fileimdb:
 												temp=json.load(data_fileimdb)
 												if "imdb_id" in temp.keys():
-													imdbid=temp["imdb_id"]
+													imdbidcrew=temp["imdb_id"]
 												if "facebook_id" in temp.keys():
 													facebook_id=temp["facebook_id"]
 													print("Facebook id",facebook_id)
@@ -244,7 +245,7 @@ def getmoviesbyyear():
 														if LA_COUNTRIES.findall(pob):
 														
 															attach="Latinx"
-													if imdbid == None:
+													if imdbidcrew == None:
 														pob_2 = ""
 														if pob == None:
 															pob_2 = str(pob)
@@ -256,9 +257,13 @@ def getmoviesbyyear():
 														pob_2 = ""
 														if pob == None:
 															pob_2 = str(pob)
+
+														imdbid_2 = str(imdbidcrew)[2:]
+
 														else:
 															pob_2 = str(pob)
 														imdbid_2 = str(imdbid)[2:]
+
 														wikipedialistcrew[1].append([str(j.get("name")),imdbid_2,pob_2])
 
 												print ("pob",pob)
